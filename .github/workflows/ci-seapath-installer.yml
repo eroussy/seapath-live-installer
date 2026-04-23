@@ -36,6 +36,9 @@ jobs:
       - name: Initialize cqfd
         run: |
           cqfd init
+      - name: Build empty seapath-live-installer
+        run: |
+          cqfd -b ci_empty
       - name: Build seapath-live-installer
         run: |
           cqfd -b ci

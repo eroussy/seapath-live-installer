@@ -7,14 +7,19 @@
 
 ## Build commands (verified)
 - Preferred path (matches CI/tooling): `cqfd init` once, then `cqfd` for local builds.
-- CI flavor command is `cqfd -b ci` (see `.github/workflows/ci-seapath-installer.yml`).
+- CI flavor commands (see `.github/workflows/ci-seapath-installer.yml`):
+  `cqfd -b ci_empty` (empty variant) then `cqfd -b ci` (full variant).
 - Non-container build: `./build.sh` (requires `sudo` and host deps equivalent to `.cqfd/docker/Dockerfile`).
+- Build an empty installer (no SEAPATH images in `DATA/images/`):
+  `./build.sh --empty` or `cqfd -b ci_empty`.
 
 ## `build.sh` behavior that affects edits
 - Version pins are hardcoded at top-level vars: `SEAPATH_IMAGES_VERSION` and `SEAPATH_INSTALLER_VERSION`.
 - Default behavior fetches `seapath-installer_${SEAPATH_INSTALLER_VERSION}_all.deb` from GitHub into `config/packages/`.
 - `--no-installer-fetch` skips download and expects that exact `.deb` to already exist in `config/packages/`.
 - On successful `make build`, script appends a FAT `DATA` partition (`extra_partition.img`, 10 GiB) using `xorriso`, then writes `seapath-live-installer-${SEAPATH_INSTALLER_VERSION}.iso`.
+- `--empty` skips SEAPATH artifacts fetch (`fetch_seapath_artifacts`): `DATA/images` stays empty and the output is renamed to `seapath-live-installer-${SEAPATH_INSTALLER_VERSION}-empty.iso`.
+- After a successful build the script removes `extra_partition.img` and `live-image-amd64.hybrid.iso` so chained builds (e.g. `ci_empty` then `ci`) start from a clean state.
 
 ## Repo structure that matters
 - `config/package-lists/*.list.chroot|binary`: package selection for the image.

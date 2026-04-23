@@ -3,8 +3,11 @@ org='seapath'
 name='seapath-live-installer'
 
 [build]
-flavors='ci'
+flavors='ci ci_empty'
 command='./build.sh'
 
 [ci]
 command='./build.sh'
+
+[ci_empty]
+command='./build.sh --empty'

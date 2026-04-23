@@ -88,6 +88,29 @@ If everything went well, an `.iso` image
 seapath-live-installer-<version>.iso will be created in the root
 directory of the project.
 
+#### Building an empty installer
+
+An "empty" variant of the installer can be built. It produces a valid
+live installer ISO with the same `DATA` partition layout but without
+any SEAPATH images bundled in `DATA/images/`. This is useful to
+provide a smaller ISO and let the user populate the `DATA` partition
+with custom SEAPATH images later.
+
+To build it with cqfd:
+
+```
+cqfd -b ci_empty
+```
+
+Or directly:
+
+```
+./build.sh --empty
+```
+
+The resulting ISO is named
+`seapath-live-installer-<version>-empty.iso`.
+
 ### Installing seapath-live-installer
 
 To install seapath-installer, simply burn the generated ISO image to a USB
@@ -164,6 +187,8 @@ https://gitlab.com/nodiscc/debian-live-config/
 ## Version 1.2.1
 - Support for seapath-installer v1.2.1
 - Add SEAPATH v1.2.1 images to the installer artifacts
+- Add `--empty` option to `build.sh` to produce an installer ISO
+  without bundled SEAPATH images
 
 ## Version 1.2.0
 - Support for seapath-installer v1.2.0

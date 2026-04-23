@@ -122,7 +122,11 @@ append_data_partition(){
     sudo mount -o loop extra_partition.img mnt_extra
 
     sudo mkdir -p mnt_extra/{ssh,images,others}
-    fetch_seapath_artifacts
+    if ! $empty; then
+        fetch_seapath_artifacts
+    else
+        echo "Building empty installer: skipping SEAPATH artifacts fetch"
+    fi
 
     sync
     sudo umount mnt_extra
@@ -137,6 +141,7 @@ append_data_partition(){
 }
 
 no_installer_fetch=false
+empty=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -144,9 +149,15 @@ while [[ $# -gt 0 ]]; do
             no_installer_fetch=true
             shift
             ;;
+        --empty)
+            empty=true
+            shift
+            ;;
         *)
             echo "Unknown option: $1"
-            echo "Use --no-installer-fetch to avoid fetching seapath-installer from GitHub"
+            echo "Usage: $0 [--no-installer-fetch] [--empty]"
+            echo "  --no-installer-fetch  Do not fetch seapath-installer from GitHub"
+            echo "  --empty               Generate an empty installer (no SEAPATH images)"
             exit 1
             ;;
     esac
@@ -160,7 +171,14 @@ make build
 
 if [ -f live-image-amd64.hybrid.iso ]; then
     append_data_partition
-    mv modified.iso seapath-live-installer-${SEAPATH_INSTALLER_VERSION}.iso
+    if $empty; then
+        output_iso="seapath-live-installer-${SEAPATH_INSTALLER_VERSION}-empty.iso"
+    else
+        output_iso="seapath-live-installer-${SEAPATH_INSTALLER_VERSION}.iso"
+    fi
+    mv modified.iso "${output_iso}"
+    # Clean up intermediate artifacts so subsequent builds start fresh
+    rm -f extra_partition.img live-image-amd64.hybrid.iso
     exit 0
 else
     echo "Build failed, see output log"
